@@ -31,12 +31,14 @@ $(document).ready(function () {
     if (sPage === "home.php") {
         ajaxLoadData();
         ajaxLoadTags();
-        ajaxSearch();
     } else if (sPage === "book.php") {
         ajaxLoadBook($.urlParam('id'));
         ajaxLoadSellers($.urlParam('id'), user_id);
     } else if (sPage === "profile.php") {
         ajaxLoadProfile(user_id);
+    } else if(sPage === "search.php"){
+        ajaxSearch();
+        ajaxLoadTags();
     }
 });
 
@@ -125,29 +127,6 @@ function ajaxLoadSellers(id,user_id) {
     });
 }
 
-function ajaxSearch() {
-    var searchResults = [];
-    $.ajax({
-        type: "POST",
-        url: "php/loadHomeData.php",
-        data: {data: "searchTitles"},
-        success: function (result) {
-            var jsonData = JSON.parse(result);
-            searchResults = [];
-            for (var i = 0; i < jsonData.length; i++) {
-                searchResults.push(['' + jsonData[i].title] + '');
-            }
-            $("#search").autocomplete({
-                source: searchResults,
-                select: function (event, ui) {
-                    seachData = ui.item.value;
-                }
-            });
-        }
-
-    });
-}
-
 function ajaxLoadProfile(user_id) {
     $.ajax({
         type: "POST",
@@ -189,7 +168,7 @@ function ajaxRemoveWishlist() {
         url: "php/loadHomeData.php",
         data: {data: "removeWishlist", bookId: $.urlParam('id'), userId: user_id},
         success: function (result) {
-            alert(result);
+            //alert(result);
             $("#addWishlist").popover(result);
             $("#addWishlist").html("Added to Wishlist");
             $("#addWishlist").prop("disabled", true);

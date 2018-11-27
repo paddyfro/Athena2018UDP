@@ -40,14 +40,14 @@ if (session_status() == PHP_SESSION_NONE) {
 
         <nav class="navbar navbar-expand-lg navbar-dark"  style="background-color:#03a9f4;">
             <div class="container">
-                <a class="navbar-brand" href="home.php"><i class='fas fa-home' style='font-size:24px'></i>BookShare</a>
+                <a class="navbar-brand" href="home.php"><i class='fas fa-home' style='font-size: 36px'><img src="images/bookshare.png" style="width:200px"/></i></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
 
-                    <form action="book.php" method="post" class="form-inline">
-                        <input class="form-control mr-sm-2" id="search" type="text" name="title" placeholder="Enter Title"/><br />
+                    <form action="search.php" method="post" class="form-inline">
+                        <input class="form-control mr-sm-2" id="search" type="text" name="search" placeholder="Search Books"/><br />
                         <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
                     </form>
                     <ul class="navbar-nav ml-auto">

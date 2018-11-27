@@ -2,10 +2,7 @@
 <?php
 require_once'php/nav.php';
 $bookId = filter_input(INPUT_GET, 'id');
-if (!isset($bookId)) {
-    $bookTitle = filter_input(INPUT_POST, 'title');
-    include 'php/search.php';
-}
+
 ?>
 
 <!--Page Content-->

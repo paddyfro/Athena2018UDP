@@ -37,7 +37,7 @@ if ($func === "getAllBooks") {
     $uaerId = filter_input(INPUT_POST, 'userId');
     $account_id = filter_input(INPUT_POST, 'account_id');
     echo returnedBook($bookId, $uaerId, $account_id);
-}elseif ($func === "refineByTags") {
+} elseif ($func === "refineByTags") {
     $category_id = filter_input(INPUT_POST, 'category');
     $troo = filter_input(INPUT_POST, 'troo');
     echo getRefinedBooks($category_id, $troo);
@@ -106,27 +106,26 @@ function getBook($bookId) {
                         <h6 class="card-title">Author</h6>
                         <p class="card-text">' . $row['author'] . '</p>
                         <h6 class="card-title">ISBN</h6>
-                        <p class="card-text">' . $row['ISBN'] . '</p><br/><br/>'.
-                        
-                        ( !isset($_SESSION['account_id']) ?  '<form action="./login.php"><input type="submit" class="btn btn-primary" value="Login to borrow this book"/>' : '<button id="addWishlist" type="button" onclick="ajaxAddWishlist()" class="btn btn-primary">Add To WishList</button> ').
-                        
-                    '</div>
+                        <p class="card-text">' . $row['ISBN'] . '</p><br/><br/>' .
+        (!isset($_SESSION['account_id']) ? '<form action="./login.php"><input type="submit" class="btn btn-primary" value="Login to borrow this book"/>' : '<button id="addWishlist" type="button" onclick="ajaxAddWishlist()" class="btn btn-primary">Add To WishList</button> ') .
+        '</div>
 
         </div>';
     }
 }
 
-function getSellers($bookId, $user_id=0) {
-    global $db;
-    $query = "SELECT a.name,a.address, a.account_id,  a.username, AVG(r.rating) as rating, a.profile_image, b.book_id, ub.uploaded_book_id, ub.book_condition, ub.available FROM account a, book b, uploaded_books ub, review r WHERE a.account_id = ub.account_id AND b.book_id = ub.book_id AND r.account_id = a.account_id AND  b.book_id = :book_Id AND ub.available > 0 GROUP BY a.username;";
-    $statement = $db->prepare($query);
-    $statement->bindValue(":book_Id", $bookId);
-    $statement->execute();
-    echo '<h2 class="my-4"><center>Lenders who have this book up for borrow</center></h2>';
-    foreach ($statement as $row) {
+function getSellers($bookId, $user_id) {
+    if (checkSellers($bookId)) {
+        global $db;
+        $query = "SELECT a.name,a.address, a.account_id,  a.username, AVG(r.rating) as rating, a.profile_image, b.book_id, ub.uploaded_book_id, ub.book_condition, ub.available FROM account a, book b, uploaded_books ub, review r WHERE a.account_id = ub.account_id AND b.book_id = ub.book_id AND r.account_id = a.account_id AND  b.book_id = :book_Id AND ub.available > 0 GROUP BY a.username;";
+        $statement = $db->prepare($query);
+        $statement->bindValue(":book_Id", $bookId);
+        $statement->execute();
+        echo '<h2 class="my-4"><center>Lenders who have this book up for borrow</center></h2>';
+        foreach ($statement as $row) {
 
-        $rating = getRating($row['rating']);
-        if (!empty($statement)) {
+            $rating = getRating($row['rating']);
+
 
 
             echo ' <div class = "card">
@@ -168,6 +167,8 @@ function getSellers($bookId, $user_id=0) {
                         <input type="text" name="days" >
                         <input type="hidden" value="' . $row['book_id'] . '" name="book_id" >
                         <input type="hidden" value="' . $row['uploaded_book_id'] . '" name="uploaded_book_id" >
+                           <p> ' . $row['uploaded_book_id'] . ' </p>
+                               <p> ' . $row['rating'] . ' </p>
                         <input type="hidden" value="' . $user_id . '" name="user_id" >
   <br>
  
@@ -184,9 +185,11 @@ function getSellers($bookId, $user_id=0) {
 
         </div>
     </div>';
-        } else {
-            echo 'no sellers';
         }
+    } else {
+        echo '<div class = container>
+            <h3><center>No Current Lenders</center></h3>
+            </div>';
     }
 }
 
@@ -311,7 +314,7 @@ function getProfileBooks($userId) {
         <h5 class = "card-title">Title</h5>
         <p>' . $row['title'] . '</p>
         <h5 class = "card-title">Available</h5>
-        <p>' . (($row['available'] == 1)?'yes':'no') . '</p>
+        <p>' . (($row['available'] == 1) ? 'yes' : 'no') . '</p>
             <button  type="button"  class="btn btn-primary">Edit details</button>
             <br/>
             <br/>
@@ -324,7 +327,7 @@ function getProfileBooks($userId) {
 
 function getHistory($user_id) {
     global $db;
-    $query = "SELECT * FROM borrowed_books bb, uploaded_books u, book b where bb.uploaded_book_id = u.uploaded_book_id and u.book_id= b.book_id and bb.returned > 0 and bb.account_id = :user_id;";
+    $query = "SELECT * FROM borrowed_books bb, uploaded_books u, book b , account a where u.account_id = a.account_id and bb.uploaded_book_id = u.uploaded_book_id and u.book_id= b.book_id and bb.returned > 0 and bb.account_id = :user_id;";
     $statement = $db->prepare($query);
     $statement->bindValue(":user_id", $user_id);
     $statement->execute();
@@ -341,6 +344,8 @@ function getHistory($user_id) {
         <div class = "card-block px-3">
         <h5 class = "card-title">Title</h5>
         <p>' . $row['title'] . '</p>
+        <h5 class = "card-title">Borrower</h5>
+        <p>' . $row['name'] . '</p>
         <h5 class = "card-title">Date Borrowed</h5>
         <p>' . $row['start_date'] . '</p>
         <h5 class = "card-title">Date Returned</h5>
@@ -356,7 +361,7 @@ function getHistory($user_id) {
 
 function getLoan($user_id) {
     global $db;
-    $query = "SELECT * FROM borrowed_books bb, uploaded_books u, book b where bb.uploaded_book_id = u.uploaded_book_id and u.book_id= b.book_id and bb.returned = 0 and bb.account_id = :user_id;";
+    $query = "SELECT * FROM borrowed_books bb, uploaded_books u, book b, account a where u.account_id = a.account_id and bb.uploaded_book_id = u.uploaded_book_id and u.book_id= b.book_id and bb.returned = 0 and bb.account_id = :user_id;";
     $statement = $db->prepare($query);
     $statement->bindValue(":user_id", $user_id);
     $statement->execute();
@@ -373,6 +378,8 @@ function getLoan($user_id) {
         <div class = "card-block px-3">
         <h5 class = "card-title">Title</h5>
         <p>' . $row['title'] . '</p>
+        <h5 class = "card-title">Borrower</h5>
+        <p>' . $row['name'] . '</p>
         <h5 class = "card-title">Date Borrowed</h5>
         <p>' . $row['start_date'] . '</p>
         <h5 class = "card-title">Return Date</h5>
@@ -531,5 +538,22 @@ function getRefinedBooks($category_id, $troo) {
               </div>
             </div>';
         }
+    }
+}
+
+function checkSellers($bookId) {
+    global $db;
+    $query = "SELECT count(1) as value FROM account a, book b, uploaded_books ub, review r WHERE a.account_id = ub.account_id AND b.book_id = ub.book_id AND r.account_id = a.account_id AND  b.book_id = :book_Id AND ub.available > 0 GROUP BY a.username;";
+    $statement = $db->prepare($query);
+    $statement->bindValue(":book_Id", $bookId);
+    $statement->execute();
+    $value = '';
+    foreach ($statement as $row) {
+        $value = $row['value'];
+    }
+    if ($value > 0) {
+        return true;
+    } else {
+        return false;
     }
 }

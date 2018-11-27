@@ -23,13 +23,11 @@
         //passing the input typed into the text box
         $("#buttondel").click(function (e) {
             e.preventDefault(); 
-            alert("data");
             $.ajax({
                 type: "POST",
                 url: "php/wishlist.php",
                 data: {uid: uid, bookID: bookID, id:id},
                 success: function (data) {
-                    alert(data);
                 }
             });
         });

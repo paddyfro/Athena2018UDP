@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $loanDays = filter_input(INPUT_POST, "days");
 $uploaded_book_id = filter_input(INPUT_POST, "uploaded_book_id");
 $user_id = filter_input(INPUT_POST, "user_id");
-
+echo $uploaded_book_id;
 
 if (!isset($loanDays)) {
     include("loadHomeData.php");
@@ -25,7 +25,7 @@ function updateBorrowedBooks($loanDays, $uploaded_book_id,$user_id) {
 
 
     $insertQuery = "INSERT INTO `borrowed_books`(`account_id`, `overdue_fees`, `overdue_days`, `start_date`, `rent_period`, `due_date`, `uploaded_book_id`, `returned`) "
-            . "VALUES (:np_acc_id,0,0,CURRENT_DATE,:np_rent_period,CURRENT_DATE+rent_period,:np_uploaded_book_id,0)";
+            . "VALUES (:np_acc_id,0,0,CURRENT_DATE,:np_rent_period,DATE_ADD(CURRENT_DATE,INTERVAL rent_period DAY),:np_uploaded_book_id,0)";
 
     $statement = $db->prepare($insertQuery);
     $statement->bindValue(":np_acc_id", $user_id);
