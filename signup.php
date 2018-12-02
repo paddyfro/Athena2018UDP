@@ -68,7 +68,8 @@ include_once'.\php\nav.php';
                 </div>
                 <div class="form-group">
                     <label for="exInputPhoneNumber"><strong>Phone Number</strong></label><span class="validSpan"></span>
-                    <input type="number" class="form-control" name="phone_number" id="exInputPhoneNumber" placeholder="Phone Number" title="must be a valid phone number. allowed format - (+44)(0)20-12341234 | 02012341234 | +44 (0) 1234-1234">                </div>
+                    <input type="number" class="form-control" name="phone_number" id="exInputPhoneNumber" placeholder="Phone Number" title="must be a valid phone number. allowed format - (+44)(0)20-12341234 | 02012341234 | +44 (0) 1234-1234">                
+                </div>
 
                 <div class="form-group">
                     <label for="exInputAge"><strong>Age</strong></label><span class="validSpan"></span>

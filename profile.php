@@ -22,6 +22,25 @@ if (!isset($_SESSION['account_id'])) {
             echo '';
         }
     }
+    if (isset($_GET["profileEdit"])) {
+        if ($_GET["profileEdit"] == "success") {
+            echo ' <h2 id="uploadSuccess"> - Edit Profile data successful!</h2>';
+        } else if ($_GET["profileEdit"] == "fail") {
+            echo ' <h2 id="uploadSuccess"> - Edit profile data failed - check your details</h2>';
+        } else {
+            echo '';
+        }
+    }
+    //profileBook
+    if (isset($_GET["profileBook"])) {
+        if ($_GET["profileBook"] == "success") {
+            echo ' <h2 id="uploadSuccess"> - Edit Book data successful!</h2>';
+        } else if ($_GET["profileBook"] == "fail") {
+            echo ' <h2 id="uploadSuccess"> - Edit Book data failed - check your details</h2>';
+        } else {
+            echo '';
+        }
+    }
     ?>
     <div class="card person-card" id="profile"></div>
 

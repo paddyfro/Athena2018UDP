@@ -232,7 +232,7 @@ function getProfile($userId) {
     ///////user id hardcoded!
 //    $userId = $_SESSION['account_id'];
 //    echo 'acc' . $_SESSION['account_id'];
-    $query = "SELECT AVG(r.rating) as rating,a.name, a.username, a.email_address, a.profile_image, l.county FROM account a, review r, location l WHERE a.account_id = r.account_id AND a.location_id = l.location_id AND a.account_id = :user_id GROUP BY a.username;";
+    $query = "SELECT AVG(r.rating) as rating,a.name, a.username,a.phone_number,a.age, a.email_address, a.profile_image, l.county FROM account a, review r, location l WHERE a.account_id = r.account_id AND a.location_id = l.location_id AND a.account_id = :user_id GROUP BY a.username;";
     $statement = $db->prepare($query);
     $statement->bindValue(":user_id", $userId);
     $statement->execute();
@@ -285,7 +285,85 @@ function getProfile($userId) {
         <a href = "./resetPassword.php" class = "btn btn-primary" role = "button">Change Password</a>
         <br/>
         <br/>
-        <a href = "#" class = "btn btn-primary" role = "button">Edit Details</a>
+
+        
+<!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Edit Details</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Edit Profile Details</h3>
+        
+      </div>
+      <div class="modal-body">
+                    <form id="signup_form" action="php/updateProfile.php" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="fullName" class = "card-title"><strong>Full Name</strong></label><span class="validSpan"></span>
+                    <input type="text" class="form-control" id="fullName" name="name" aria-describedby="emailHelp" value = "' . $row['name'] . '" placeholder="Enter full name" title="string of at least 4 chars in length, allowing alphabetic, numeric and " ">
+                </div>
+                                <div class="form-group">
+                    <label for="exUserName"><strong>User Name</strong></label><span class="validSpan"></span>
+                    <input type="text" class="form-control" id="exUserName" name="username" aria-describedby="emailHelp" value="' . $row['username'] . '"placeholder="Enter User Name" pattern="[a-zA-Z0-9_]+" title="string of at least 4 chars in length, allowing alphabetic, numeric and " ">
+                </div>
+                                <div class="form-group">
+                    <label for="exInputAddress"><strong>Location (County)</strong></label><span class="validSpan"></span>
+                    <select class="form-control" name="address" id="exInputAddress" size="6">
+                        <option value="Antrim">Antrim</option>
+                        <option value="Armagh">Armagh</option>
+                        <option value="Carlow">Carlow</option>
+                        <option value="Cavan">Cavan</option>
+                        <option value="Clare">Clare</option>
+                        <option value="Cork">Cork</option>
+                        <option value="Derry">Derry</option>
+                        <option value="Donegal">Donegal</option>
+                        <option value="Down">Down</option>
+                        <option value="Dublin">Dublin</option>
+                        <option value="Fermanagh">Fermanagh</option>
+                        <option value="Galway">Galway</option>
+                        <option value="Kerry">Kerry</option>
+                        <option value="Kildare">Kildare</option>
+                        <option value="Kilkenny">Kilkenny</option>
+                        <option value="Loais">Laois</option>
+                        <option value="Leitrim">Leitrim</option>
+                        <option value="Limerick">Limerick</option>
+                        <option value="Longford">Longford</option>
+                        <option value="Louth">Louth</option>
+                        <option value="Mayo">Mayo</option>
+                        <option value="Meath">Meath</option>
+                        <option value="Monaghan">Monaghan</option>
+                        <option value="Offaly">Offaly</option>
+                        <option value="Roscommon">Roscommon</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exInputPhoneNumber"><strong>Phone Number</strong></label><span class="validSpan"></span>
+                    <input type="number" class="form-control" name="phone_number" id="exInputPhoneNumber" value = "' . $row['phone_number'] . '" placeholder="Phone Number" title="must be a valid phone number. allowed format - (+44)(0)20-12341234 | 02012341234 | +44 (0) 1234-1234">                
+                </div>
+
+                <div class="form-group">
+                    <label for="exInputAge"><strong>Age</strong></label><span class="validSpan"></span>
+                    <input type="number" class="form-control" name="age" id="exInputAge" value = "' . $row['age'] . '" placeholder="Age"  title="Must be a vialld age 17- 120">
+                </div>
+                <button type="submit" class="btn btn-primary" name="editProfile-submit">Submit Changes</button>
+                  </form>
+      </div>
+      <div class="modal-footer">
+      
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Dont change anything</button>
+      </div>
+    
+    </div>
+
+  </div>
+</div>
+
+
         </div>
         </div>
         </div>
@@ -315,9 +393,54 @@ function getProfileBooks($userId) {
         <p>' . $row['title'] . '</p>
         <h5 class = "card-title">Available</h5>
         <p>' . (($row['available'] == 1) ? 'yes' : 'no') . '</p>
-            <button  type="button"  class="btn btn-primary">Edit details</button>
-            <br/>
-            <br/>
+        <h5 class = "card-title">Condition</h5>
+        <p>' . $row['book_condition'] . '</p>
+
+<!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edirBookDetailsModal">Edit Details</button>
+
+<!-- Modal -->
+<div id="edirBookDetailsModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Edit Profile Details</h3>
+        
+      </div>
+      <div class="modal-body">
+                    <form id="signup_form" action="php/updateUploadedBook.php" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="exInputAddress"><strong>Book Condition</strong></label><span class="validSpan"></span>
+                    <select class="form-control" name="bkCondition" id="exBkCondition" size="5">
+                        <option value="New">New</option>
+                        <option value="Excellent">Excellent</option>
+                        <option value="Great">great</option>
+                        <option value="Good">Good</option>
+                        <option value="Poor">Poor</option>
+                    </select>
+                </div>
+                <input type="hidden" id="bk_uploadedBook_id" name="bk_uploadedBook_id" value="'.$row['uploaded_book_id'].'">
+                <button type="submit" class="btn btn-primary" name="editUploadedBook-submit">Submit Changes</button>
+                  </form>
+      </div>
+      <div class="modal-footer">
+      
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Dont change anything</button>
+      </div>
+    
+    </div>
+
+  </div>
+</div>
+
+
+
+
+        <br/>
+        <br/>
         </div>
         </div>
         </div>
@@ -558,9 +681,8 @@ function checkSellers($bookId) {
     }
 }
 
-
-function getSharedBooks($user_id){
-        global $db;
+function getSharedBooks($user_id) {
+    global $db;
     $query = "SELECT * FROM uploaded_books ub, book b, borrowed_books bb, account a WHERE ub.book_id = b.book_id AND bb.uploaded_book_id = ub.uploaded_book_id AND a.account_id = bb.account_id AND ub.account_id = :user_id AND ub.available =0 AND bb.returned = 0";
     $statement = $db->prepare($query);
     $statement->bindValue(":user_id", $user_id);
@@ -586,9 +708,7 @@ function getSharedBooks($user_id){
         <p>' . $row['due_date'] . '</p>
         <h5 class = "card-title">Days Borrowed</h5>
         <p>' . $row['rent_period'] . '</p>
-        <button id="returnedBook" type="button" onclick="ajaxReturnedBook(' . $row['uploaded_book_id'] . ',' . $row['account_id'] . ')" class="btn btn-primary">Confirm Returned</button>
-        <br/>
-        <br/>
+
         </div>
         </div>
         </div>
