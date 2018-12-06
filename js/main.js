@@ -140,6 +140,8 @@ function ajaxLoadProfile(user_id) {
             $("#history").html(output[2]);
             $("#wishlist").html(output[3]);
             $("#booksLoan").html(output[4]);
+            //booksShared
+            $("#booksShared").html(output[5]);
 //            alert(output[4]);
         }
 

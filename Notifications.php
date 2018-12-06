@@ -71,7 +71,11 @@ function updateNotifications($notification,$account_id) {
     ?>
        <?php endforeach; ?>
   
+
 //<?php
+
+
+
 ////getting the wishlist
 //function getWishlist($user_id) {
 //    global $db;
@@ -130,7 +134,7 @@ function getNofications($user_id) {
    
     foreach ($notificationData as $notification) {
 
-       echo "<br><br><center><b>".$notification['created_on']."</b> ".$notification['notification'].'</center>';
+       echo "<br><br><p><b>".$notification['created_on']."</b> ".$notification['notification'].'</p';
     }
 }
 ?>

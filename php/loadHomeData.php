@@ -26,8 +26,8 @@ if ($func === "getAllBooks") {
     $returnMyHistoey = getHistory($user_id);
     $returnMyWishlist = getWishlist($user_id);
     $returnMyLoans = getLoan($user_id);
-
-    echo json_encode(array($returnProfile, $returnMyBooks, $returnMyHistoey, $returnMyWishlist, $returnMyLoans));
+    $returnMySharedBooks = getSharedBooks($user_id);
+    echo json_encode(array($returnProfile, $returnMyBooks, $returnMyHistoey, $returnMyWishlist, $returnMyLoans, $returnMySharedBooks));
 } elseif ($func === "addWishlist") {
     $bookId = filter_input(INPUT_POST, 'bookId');
     $uaerId = filter_input(INPUT_POST, 'userId');
@@ -557,3 +557,42 @@ function checkSellers($bookId) {
         return false;
     }
 }
+
+
+function getSharedBooks($user_id){
+        global $db;
+    $query = "SELECT * FROM uploaded_books ub, book b, borrowed_books bb, account a WHERE ub.book_id = b.book_id AND bb.uploaded_book_id = ub.uploaded_book_id AND a.account_id = bb.account_id AND ub.account_id = :user_id AND ub.available =0 AND bb.returned = 0";
+    $statement = $db->prepare($query);
+    $statement->bindValue(":user_id", $user_id);
+    $statement->execute();
+    $value = '';
+    foreach ($statement as $row) {
+
+        $value = $value . '<div class = "card">
+        <div class = "row">
+        <div class = "col-md-4">
+       <!-- <img src = "images/book/' . $row['image'] . '" alt = "" class = "w-100"/> -->
+            <a href="book.php?id=' . ($row['book_id']) . '"><img class="card-img-top" src="images/book/' . $row['image'] . '" alt=""></a>
+        </div>
+        <div class = "col-md-8">
+        <div class = "card-block px-3">
+        <h5 class = "card-title">Title</h5>
+        <p>' . $row['title'] . '</p>
+        <h5 class = "card-title">Borrower</h5>
+        <p>' . $row['name'] . '</p>
+        <h5 class = "card-title">Date Borrowed</h5>
+        <p>' . $row['start_date'] . '</p>
+        <h5 class = "card-title">Return Date</h5>
+        <p>' . $row['due_date'] . '</p>
+        <h5 class = "card-title">Days Borrowed</h5>
+        <p>' . $row['rent_period'] . '</p>
+        <button id="returnedBook" type="button" onclick="ajaxReturnedBook(' . $row['uploaded_book_id'] . ',' . $row['account_id'] . ')" class="btn btn-primary">Confirm Returned</button>
+        <br/>
+        <br/>
+        </div>
+        </div>
+        </div>
+        </div>';
+    }return $value;
+}
+

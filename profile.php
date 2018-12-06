@@ -28,15 +28,14 @@ if (!isset($_SESSION['account_id'])) {
     <!-- Profile Content -->
     <div class="row">
         <div class="col-md-6" style="padding-top:0.5em;">
-            <div class="card">
+            <div class="card"> 
                 <div class="card-body">
-                    <h2 class="card-title">Wishlist</h2>
-                    <button class="btn btn-primary " data-toggle="collapse" data-target="#wishlist">Show Whishlist</button>    
+                    <h2 class="card-title">Currently Shared Books</h2>
+                    <button class="btn btn-primary " data-toggle="collapse" data-target="#booksShared">Show Shared Books</button>    
                     <div class="col-sm-12 col-xs-12 my-1">
-                        <div id="wishlist" class="collapse">
+                        <div id="booksShared" class="collapse">
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -53,6 +52,20 @@ if (!isset($_SESSION['account_id'])) {
                 </div>
             </div>
         </div>
+        <div class="col-md-6" style="padding-top:0.5em;">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Wishlist</h2>
+                    <button class="btn btn-primary " data-toggle="collapse" data-target="#wishlist">Show Whishlist</button>    
+                    <div class="col-sm-12 col-xs-12 my-1">
+                        <div id="wishlist" class="collapse">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-6" style="padding-top:0.5em;">
             <div class="card">
                 <div class="card-body">
