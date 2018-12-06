@@ -200,3 +200,24 @@ function updateUserPassword($pwd, $accId, $db){
 //        exit();
 //    }   
 }
+
+
+//insert into request table
+function insertIntoRequests($db, $upload_book_id, $days, $borrower_id, $lender_id){
+    echo "inster";
+          try {
+        $query = 'INSERT INTO requests (uploaded_book_id, days, borrower_id,lender_id) VALUES (:np_uploaded_book_id, :np_days, :np_borrower_id, :np_lender_id)';
+        $statement = $db->prepare($query);
+        echo "inster1";
+        $statement->bindValue(':np_uploaded_book_id', $upload_book_id);
+        $statement->bindValue(':np_days', $days);
+        $statement->bindValue(':$borrower_id', $borrower_id);
+        $statement->bindValue(':np_lender_id', $lender_id);
+        $statement->execute();
+    } catch (PDOException $e) {
+        $error = $e->getMessage();
+        include('database_error.php');
+        exit();
+    }
+    
+}

@@ -24,10 +24,12 @@ try {
     //$query = 'INSERT INTO requests (uploaded_book_id, days, borrower_id,lender_id) VALUES (:np_uploaded_book_id, :np_days, :np_borrower_id, :np_lender_id)';
     $query1 = "INSERT INTO requests (uploaded_book_id, days, borrower_id, lender_id) VALUES (:np_uploaded_book_id, :np_days, :np_borrower_id, :np_lender_id)";
     $statement6 = $db->prepare($query1);
+    echo "inster1";
     $statement6->bindValue(':np_uploaded_book_id', $uploaded_book_id);
     $statement6->bindValue(':np_days', $loanDays);
     $statement6->bindValue(':np_borrower_id', $user_id);
     $statement6->bindValue(':np_lender_id', $lender_id);
+    echo "inster2";
     $statement6->execute();
 } catch (PDOException $e) {
     $error = $e->getMessage();

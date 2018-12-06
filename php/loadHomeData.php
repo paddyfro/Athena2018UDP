@@ -12,6 +12,15 @@ if ($func === "getAllBooks") {
     $bookId = filter_input(INPUT_POST, 'bookId');
     getBook($bookId);
     //getSellers($bookId);
+} elseif ($func === "getWishlist") {
+    $bookId = filter_input(INPUT_POST, 'bookId');
+    $user_id = filter_input(INPUT_POST, 'userId');
+
+    $GetBookWishlist = getBookWishlist($bookId);
+    $GetpopupWishlist = getWishlist($user_id);
+
+    echo json_encode(array($GetBookWishlist, $GetpopupWishlist));
+    //getSellers($bookId);
 } elseif ($func === "getSellers") {
     $bookId = filter_input(INPUT_POST, 'bookId');
     $user_id = filter_input(INPUT_POST, 'user_id');
@@ -27,11 +36,17 @@ if ($func === "getAllBooks") {
     $returnMyWishlist = getWishlist($user_id);
     $returnMyLoans = getLoan($user_id);
     $returnMySharedBooks = getSharedBooks($user_id);
-    echo json_encode(array($returnProfile, $returnMyBooks, $returnMyHistoey, $returnMyWishlist, $returnMyLoans, $returnMySharedBooks));
+    $returnMyRequests = getRequests($user_id);
+
+    echo json_encode(array($returnProfile, $returnMyBooks, $returnMyHistoey, $returnMyWishlist, $returnMyLoans, $returnMySharedBooks,$returnMyRequests));
 } elseif ($func === "addWishlist") {
     $bookId = filter_input(INPUT_POST, 'bookId');
     $uaerId = filter_input(INPUT_POST, 'userId');
     echo addWishlist($bookId, $uaerId);
+} elseif ($func === "removeWishlist") {
+    $bookId = filter_input(INPUT_POST, 'bookId');
+    $uaerId = filter_input(INPUT_POST, 'userId');
+    echo removeWishlist($bookId, $uaerId);
 } elseif ($func === "returnedBook") {
     $bookId = filter_input(INPUT_POST, 'bookId');
     $uaerId = filter_input(INPUT_POST, 'userId');
@@ -106,9 +121,8 @@ function getBook($bookId) {
                         <h6 class="card-title">Author</h6>
                         <p class="card-text">' . $row['author'] . '</p>
                         <h6 class="card-title">ISBN</h6>
-                        <p class="card-text">' . $row['ISBN'] . '</p><br/><br/>' .
-        (!isset($_SESSION['account_id']) ? '<form action="./login.php"><input type="submit" class="btn btn-primary" value="Login to borrow this book"/>' : '<button id="addWishlist" type="button" onclick="ajaxAddWishlist()" class="btn btn-primary">Add To WishList</button> ') .
-        '</div>
+                        <p class="card-text">' . $row['ISBN'] . '</p><br/><br/>
+        </div>
 
         </div>';
     }
@@ -156,24 +170,25 @@ function getSellers($bookId, $user_id) {
                             <div class="modal-dialog">
                             <div class="modal-content">
                             <div class="modal-header">
+                            <h3 class="modal-title">Request Book Form</h3>
                             <button type="button" class="close" data-dismiss="modal" aria-label=""><span>×</span></button>
                             </div>
                             <!--Content For Popver-->
                             <div class="modal-body"> <!--ADD INPUT HERE!!!!!!!!!!!!!!!!IN THIS DIV-->
-                  
+                            
+                            <p>A message will be sent to the lender of this book and they will accpet of deny this request.</p>
                                 <div class="thank-you-pop">
-                                   <form action="borrow_book.php" method="POST">
-                        Loan days<br>
+                    <form action="requestBook.php" method="POST">
+                        Please enter how many days you would like the book for:<br>
                         <input type="text" name="days" >
                         <input type="hidden" value="' . $row['book_id'] . '" name="book_id" >
                         <input type="hidden" value="' . $row['uploaded_book_id'] . '" name="uploaded_book_id" >
-                           <p> ' . $row['uploaded_book_id'] . ' </p>
-                               <p> ' . $row['rating'] . ' </p>
                         <input type="hidden" value="' . $user_id . '" name="user_id" >
-  <br>
+                        <input type="hidden" value="' . $row['account_id'] . '" name="lender_id" >
+                        <br>
  
-  <input type="submit" value="Confirm">
-</form> 
+                        <input type="submit" value="Request Book">
+                    </form> 
 
                                 </div>
                         </div>		
@@ -397,7 +412,7 @@ function getProfileBooks($userId) {
         <p>' . $row['book_condition'] . '</p>
 
 <!-- Trigger the modal with a button -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edirBookDetailsModal">Edit Details</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edirBookDetailsModal">Edit Condition</button>
 
 <!-- Modal -->
 <div id="edirBookDetailsModal" class="modal fade" role="dialog">
@@ -407,7 +422,7 @@ function getProfileBooks($userId) {
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">Edit Profile Details</h3>
+        <h3 class="modal-title">Edit Book Condition</h3>
         
       </div>
       <div class="modal-body">
@@ -509,9 +524,8 @@ function getLoan($user_id) {
         <p>' . $row['due_date'] . '</p>
         <h5 class = "card-title">Days Borrowed</h5>
         <p>' . $row['rent_period'] . '</p>
-        <button id="returnedBook" type="button" onclick="ajaxReturnedBook(' . $row['uploaded_book_id'] . ',' . $row['account_id'] . ')" class="btn btn-primary">Confirm Returned</button>
-        <br/>
-        <br/>
+        <!--    <button id="returnedBook" type="button" onclick="ajaxReturnedBook(' . $row['uploaded_book_id'] . ',' . $row['account_id'] . ')" class="btn btn-primary">Confirm Returned</button>    -->
+
         </div>
         </div>
         </div>
@@ -535,6 +549,20 @@ function addWishlist($bookId, $userId) {
     }
 }
 
+function removeWishlist($bookId, $userId) {
+
+    //if (!checkWiskList($bookId, $userId)) {
+    global $db;
+    $query = 'DELETE FROM `wish_list` WHERE account_id = :userId and book_id = :bookId';
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userId', $userId);
+    $statement->bindValue(':bookId', $bookId);
+    $statement->execute();
+    $statement->closeCursor();
+    return 'Removed';
+    //}
+}
+
 //        <span class = "float-right"><i class = "text-warning fas fa-star"></i></span>
 //        <span class = "float-right"><i class = "text-warning far fa-star"></i></span>
 //        <span class = "float-right"><i class = "text-warning fa fa-star"></i></span>
@@ -555,8 +583,32 @@ function getRating($rating) {
     }
 }
 
-function getWishlist($user_id) {
+function getBookWishlist($book_id) {
+    $troo = true;
+    if (!isset($_SESSION['account_id'])) {
+        echo '<form action="./login.php"><input type="submit" class="btn btn-primary" value="Login to borrow this book"/>';
+    } else {
+        $user_id = $_SESSION['account_id'];
+        global $db;
+        $query = "SELECT * FROM wish_list WHERE book_id = :book_id and account_id = :account_id;";
+        $statement = $db->prepare($query);
+        $statement->bindValue(":book_id", $book_id);
+        $statement->bindValue(":account_id", $user_id);
+        $statement->execute();
+        foreach ($statement as $row) {
+            $troo = false;
+            return '<button id="removeWishlist" type="button" onclick="ajaxRemoveWishlist()" class="btn btn-primary">Remove From WishList</button>
+                ';
+        }
+        if ($troo == true) {
+            return '<button id="addWishlist" type="button" data-toggle="modal" data-target="#myModal" onclick="ajaxAddWishlist()" class="btn btn-primary">Add To WishList</button>
+                ';
+        }
+    }
+}
 
+function getWishlist($user_id) {
+    $troo = true;
     global $db;
     $query = "SELECT * FROM wish_list w, book b, account a WHERE w.book_id = b.book_id AND a.account_id = w.account_id AND a.account_id = :user_id;";
     $statement = $db->prepare($query);
@@ -564,8 +616,9 @@ function getWishlist($user_id) {
     $statement->execute();
     $value = '';
     foreach ($statement as $row) {
-
+        $troo = false;
         $value = $value . '
+        <div id = "wishlistProfile' . $row['book_id'] . '">      
         <div class = "card">
         <div class = "row">
         <div class = "col-md-4">
@@ -575,15 +628,18 @@ function getWishlist($user_id) {
         <div class = "col-md-8">
         <div class = "card-block px-3">
         <h5 class = "card-title">Title</h5>
-        <p>' . $row['title'] . '</p>
-        <button id="removeWishlist" type="button" onclick="ajaxRemoveWishlist()" class="btn btn-primary">Remove</button>
-
- 
-        </div>
+        <p>' . $row['title'] . '</p> 
+            <button id="removeWishlist" type="button" onclick="ajaxRemoveWishlistProfile(' . $row['book_id'] . ')" class="btn btn-primary">Remove</button>      
+</div>
+</div>
         </div>
         </div>
         </div>';
-    }return $value;
+    }
+    if ($troo == true) {
+        
+    }
+    return $value;
 }
 
 function checkWiskList($bookId, $userId) {
@@ -608,24 +664,24 @@ function checkWiskList($bookId, $userId) {
 function returnedBook($bookId, $userId, $account_id) {
     global $db;
     //if (returnedBook($bookId, $userId)) {
-    $query = 'Update borrowed_books set returned = 1 WHERE account_id = :userId AND uploaded_book_id = :uploaded_book_id';
+    $query = 'Update borrowed_books set returned = 1 WHERE account_id = :account_id AND uploaded_book_id = :uploaded_book_id';
     $statement = $db->prepare($query);
-    $statement->bindValue(':userId', $userId);
+    $statement->bindValue(':account_id', $account_id);
     $statement->bindValue(':uploaded_book_id', $bookId);
     $statement->execute();
     $statement->closeCursor();
-    setUploaded($bookId, $account_id);
-    return getLoan($userId);
+    setUploaded($bookId, $userId);
+    return getSharedBooks($userId);
     //} else {        
     //}
 }
 
-function setUploaded($bookId, $account_id) {
+function setUploaded($bookId, $userId) {
     global $db;
     //if (returnedBook($bookId, $userId)) {
     $query = 'Update uploaded_books set available = 1 WHERE account_id = :userId AND uploaded_book_id = :uploaded_book_id';
     $statement = $db->prepare($query);
-    $statement->bindValue(':userId', $account_id);
+    $statement->bindValue(':userId', $userId);
     $statement->bindValue(':uploaded_book_id', $bookId);
     $statement->execute();
     $statement->closeCursor();
@@ -708,7 +764,9 @@ function getSharedBooks($user_id) {
         <p>' . $row['due_date'] . '</p>
         <h5 class = "card-title">Days Borrowed</h5>
         <p>' . $row['rent_period'] . '</p>
-
+            <button id="returnedBook" type="button" onclick="ajaxReturnedBook(' . $row['uploaded_book_id'] . ',' . $row['account_id'] . ')" class="btn btn-primary">Confirm Returned</button>
+        </br>
+        </br>
         </div>
         </div>
         </div>
@@ -716,3 +774,28 @@ function getSharedBooks($user_id) {
     }return $value;
 }
 
+function getRequests($user_id) {
+    global $db;
+    $query = "SELECT a.username , r.days , b.title FROM requests r , uploaded_books ub, account a , book b WHERE r.uploaded_book_id = ub.uploaded_book_id AND r.borrower_id = a.account_id AND b.book_id = ub.book_id AND r.lender_id = :user_id AND r.accept = 2";
+    $statement = $db->prepare($query);
+    $statement->bindValue(":user_id", $user_id);
+    $statement->execute();
+    $value = '';
+    foreach ($statement as $row) {
+
+        $value = $value . '<div class="card card-pricing popular px-3 mb-4">
+            <span class="h6 w-60 mx-auto px-4 py-1 rounded-bottom bg-primary text-white shadow-sm">Active Request</span>
+            
+            <div class="card-body pt-0">
+                <ul class="list-unstyled">
+                    <li><strong>Borrower: </strong>'.$row['username'].'</li>
+                    <li><strong>Book: </strong>'.$row['title'].'</li>
+                    <li><strong>Loan Days: </strong>'.$row['days'].'</li>
+                  
+                </ul>
+                <a class="btn btn-primary">Confirm</a>
+                <a class="btn btn-primary">Deny</a>
+            </div>
+        </div>';
+    }return $value;
+}

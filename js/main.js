@@ -33,7 +33,8 @@ $(document).ready(function () {
         ajaxLoadTags();
     } else if (sPage === "book.php") {
         ajaxLoadBook($.urlParam('id'));
-        ajaxLoadSellers($.urlParam('id'), user_id);
+        ajaxLoadSellers($.urlParam('id'),user_id);
+        ajaxLoadWishlist($.urlParam('id'));
     } else if (sPage === "profile.php") {
         ajaxLoadProfile(user_id);
     } else if(sPage === "search.php"){
@@ -127,6 +128,21 @@ function ajaxLoadSellers(id,user_id) {
     });
 }
 
+function ajaxLoadWishlist(id) {
+    var userId = user_id;
+    $.ajax({
+        type: "POST",
+        url: "php/loadHomeData.php",
+        data: {data: "getWishlist", bookId: id, userId: userId}, // or function=two if you want the other to be called
+        dataType: "html",
+        success: function (result) {
+            var output = $.parseJSON(result);
+            $("#showWishListButton").html(output[0]);
+            $("#wishlistBook").html(output[1]);
+        }
+    });
+}
+
 function ajaxLoadProfile(user_id) {
     $.ajax({
         type: "POST",
@@ -142,6 +158,7 @@ function ajaxLoadProfile(user_id) {
             $("#booksLoan").html(output[4]);
             //booksShared
             $("#booksShared").html(output[5]);
+            $("#bookRequests").html(output[6]);
 //            alert(output[4]);
         }
 
@@ -154,26 +171,35 @@ function ajaxAddWishlist() {
         type: "POST",
         url: "php/loadHomeData.php",
         data: {data: "addWishlist", bookId: $.urlParam('id'), userId: userId},
-        success: function (result) {
-            alert(result);
-            $("#addWishlist").popover(result);
-            $("#addWishlist").html("Added to Wishlist");
+        success: function () {
+            $("#addWishlist").html("Added To Wishlist");
             $("#addWishlist").prop("disabled", true);
         }
     });
 }
 
 function ajaxRemoveWishlist() {
-    var user_id = 9;
+    var userId = user_id;
     $.ajax({
         type: "POST",
         url: "php/loadHomeData.php",
-        data: {data: "removeWishlist", bookId: $.urlParam('id'), userId: user_id},
-        success: function (result) {
-            //alert(result);
-            $("#addWishlist").popover(result);
-            $("#addWishlist").html("Added to Wishlist");
-            $("#addWishlist").prop("disabled", true);
+        data: {data: "removeWishlist", bookId: $.urlParam('id'), userId: userId},
+        success: function () {
+            $("#removeWishlist").html("Removed From Wishlist");
+            $("#removeWishlist").prop("disabled", true);
+        }
+    });
+}
+
+function ajaxRemoveWishlistProfile($bookID) {
+    var string = "#wishlistProfile" + $bookID;
+    var userId = user_id;
+    $.ajax({
+        type: "POST",
+        url: "php/loadHomeData.php",
+        data: {data: "removeWishlist", bookId: $bookID, userId: userId},
+        success: function () {
+            $(string).hide();
         }
     });
 }
@@ -185,7 +211,7 @@ function ajaxReturnedBook(book_id,account_id) {
         url: "php/loadHomeData.php",
         data: {data: "returnedBook", bookId: book_id, userId: userId, account_id: account_id},
         success: function (result) {
-            $("#booksLoan").html(result); 
+            $("#booksShared").html(result); 
         }
     });
 }

@@ -60,9 +60,9 @@ if (!isset($_SESSION['account_id'])) {
         </div>
         <div class="col-md-6" style="padding-top:0.5em;">
             <div class="card"> 
-                <div class="card-body">
+                <div class="card-body" >
                     <h2 class="card-title">Currently Borrowed Books</h2>
-                    <button class="btn btn-primary " data-toggle="collapse" data-target="#booksLoan">Show Borrowed Books</button>    
+                    <button class="btn btn-primary " data-toggle="collapse" data-target="#booksLoan" >Show Borrowed Books</button>    
                     <div class="col-sm-12 col-xs-12 my-1">
                         <div id="booksLoan" class="collapse">
                         </div>
@@ -105,6 +105,18 @@ if (!isset($_SESSION['account_id'])) {
                     <button class="btn btn-primary " data-toggle="collapse" data-target="#history">Show History</button>    
                     <div class="col-sm-12 col-xs-12 my-1">
                         <div id="history" class="collapse">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" style="padding-top:0.5em;">
+            <div class="card"> 
+                <div class="card-body">
+                    <h2 class="card-title">Pending Requests</h2>
+                    <button class="btn btn-primary " data-toggle="collapse" data-target="#bookRequests">Show Requests</button>    
+                    <div class="col-sm-12 col-xs-12 my-1">
+                        <div id="bookRequests" class="collapse">
                         </div>
                     </div>
                 </div>

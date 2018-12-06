@@ -71,11 +71,7 @@ function updateNotifications($notification,$account_id) {
     ?>
        <?php endforeach; ?>
   
-
-//<?php
-
-
-
+<?php
 ////getting the wishlist
 //function getWishlist($user_id) {
 //    global $db;

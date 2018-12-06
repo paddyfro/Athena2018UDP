@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $loanDays = filter_input(INPUT_POST, "days");
 $uploaded_book_id = filter_input(INPUT_POST, "uploaded_book_id");
 $user_id = filter_input(INPUT_POST, "user_id");
-echo $uploaded_book_id;
+//echo $uploaded_book_id;
 
 if (!isset($loanDays)) {
     include("loadHomeData.php");
